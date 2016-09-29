@@ -8,4 +8,4 @@ const reviewSchema = new Schema({
   overallRating: Number
 });
 
-module.exports = mongoose.model('Review', reviewSchema);
+export default mongoose.model('Review', reviewSchema);

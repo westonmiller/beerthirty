@@ -18,4 +18,4 @@ beerSchema.virtual('rating').get(function () {
 });
 
 
-module.exports = mongoose.model('Beer', beerSchema);
+export default mongoose.model('Beer', beerSchema);
