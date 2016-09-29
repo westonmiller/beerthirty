@@ -19,25 +19,25 @@ app.post('/beers', (request, response) => {
       name: name.toLowerCase(),
       brewery: brewery.toLowerCase()
     }, (error, beers) => {
-    if (beers.length) {
-      response.status(409)
-              .send({error: 'Beer already exists'});
-    } else {
-      const newBeer = new Beer({
-        name: name.toLowerCase(),
-        brewery: brewery.toLowerCase(),
-        submitter: submitter.toLowerCase(),
-        description
-      });
+      if (beers.length) {
+        response.status(409)
+                .send({error: 'Beer already exists'});
+      } else {
+        const newBeer = new Beer({
+          name: name.toLowerCase(),
+          brewery: brewery.toLowerCase(),
+          submitter: submitter.toLowerCase(),
+          description
+        });
 
-      newBeer.save((error, beer) => {
-        if (!error) {
-          response.status(201).send(beer);
-        } else {
-          response.send(error);
-        }
-      });
-    }
+        newBeer.save((error, beer) => {
+          if (!error) {
+            response.status(201).send(beer);
+          } else {
+            response.send(error);
+          }
+        });
+      }
   });
 });
 
@@ -68,13 +68,16 @@ app.delete('/beers/:id', (request, response) => {
   const { id } = request.params;
 
   Beer.findById(id, (error, beer) => {
-    beer.remove((error) => {
-      if (!error) {
-        response.send('Beer Deleted');
-      } else {
-        response.status(404).send('No Beer Found');
-      }
-    });
+    if (!error && beer) {
+      beer.remove((error) => {
+        if (!error) {
+          Review.remove({beerId: id});
+          response.send('Beer Deleted');
+        }
+      });
+    } else {
+      response.status(404).send('No Beer Found');
+    }
   });
 });
 
@@ -90,7 +93,8 @@ app.post('/beers/:id/reviews', (request, response) => {
     if (!error && beer) {
       const newReview = new Review({
         overallRating: overallRating,
-        reviewer: reviewer
+        reviewer: reviewer,
+        beerId: id
       });
 
       newReview.save((error, review) => {
