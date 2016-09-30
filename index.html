@@ -83,7 +83,7 @@
     </style>
   </head>
   <body unresolved>
-    <template is="dom-bind" id="app" noscript>
+    <template is="dom-bind" id="app">
       <app-toolbar>
         <div main-title>Brew Tally</div>
         <span class="votingTimer">{{votingStatus}}<span class="timer">{{timeTillEventOver}}</span></span>
@@ -169,33 +169,39 @@
   </body>
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    let app = document.querySelector('#app');
+    const beerTally = document.querySelector('#app');
 
-    app.isValid = false;
-    app.hiddenRating = true;
+    console.log('Ready')
 
-    app.addBeer = () => {
-      app.$.addBeerModal.open();
+    beerTally.addEventListener('dom-change', function()  {
+      console.log('bound')
+    });
+
+    beerTally.isValid = false;
+    beerTally.hiddenRating = true;
+
+    beerTally.addBeer = () => {
+      beerTally.$.addBeerModal.open();
     };
 
-    app.submitBeer = () => {
-      const { beerName, brewery, submitterName, description } = app;
+    beerTally.submitBeer = () => {
+      const { beerName, brewery, submitterName, description } = beerTally;
       const newBeer = {
         name: beerName,
         brewery,
         description,
         submitter: submitterName
       }
-      app.$.createBeerAjax.body = newBeer;
-      app.$.createBeerAjax.generateRequest();
+      beerTally.$.createBeerAjax.body = newBeer;
+      beerTally.$.createBeerAjax.generateRequest();
     }
 
-    app.closeAddBeerModal = () => {
-      const { beerName, brewery, description, submitterName, addBeerSubmitButton } = app.$
-      app.beerName = '';
-      app.brewery = '';
-      app.description = '';
-      app.submitterName = '';
+    beerTally.closeAddBeerModal = () => {
+      const { beerName, brewery, description, submitterName, addBeerSubmitButton } = beerTally.$
+      beerTally.beerName = '';
+      beerTally.brewery = '';
+      beerTally.description = '';
+      beerTally.submitterName = '';
 
       addBeerSubmitButton.focus();
 
@@ -204,30 +210,30 @@
       description.invalid = false;
       submitterName.invalid = false;
 
-      app.checkValidation();
+      beerTally.checkValidation();
 
-      app.$.addBeerModal.close();
+      beerTally.$.addBeerModal.close();
     };
 
-    app.beerAdded = () => {
-      app.$.beersAjax.generateRequest();
-      app.closeAddBeerModal();
+    beerTally.beerAdded = () => {
+      beerTally.$.beersAjax.generateRequest();
+      beerTally.closeAddBeerModal();
     };
 
-    app.checkValidation = () => {
-      const { beerName, brewery, submitterName } = app
+    beerTally.checkValidation = () => {
+      const { beerName, brewery, submitterName } = beerTally
 
-      if (app.$.beerName.focused) {
-        app.$.beerName.validate()
+      if (beerTally.$.beerName.focused) {
+        beerTally.$.beerName.validate()
       }
-      if (app.$.brewery.focused) {
-        app.$.brewery.validate()
+      if (beerTally.$.brewery.focused) {
+        beerTally.$.brewery.validate()
       }
-      if (app.$.submitterName.focused) {
-        app.$.submitterName.validate()
+      if (beerTally.$.submitterName.focused) {
+        beerTally.$.submitterName.validate()
       }
 
-      app.isValid = (beerName !== '')
+      beerTally.isValid = (beerName !== '')
                     && (brewery !== '')
                     && (submitterName !== '');
     }
@@ -238,17 +244,17 @@
     });
     socket.on('timeTillEventOver', function (data) {
       if (data.seconds >= 0) {
-        app.hiddenRating = true;
-        app.votingStatus = "Voting Ends"
-        app.timeTillEventOver = data.timeTillEventOver;
+        beerTally.hiddenRating = true;
+        beerTally.votingStatus = "Voting Ends"
+        beerTally.timeTillEventOver = data.timeTillEventOver;
       } else {
-        app.hiddenRating = false;
-        app.votingStatus = "Voting Over"
-        app.timeTillEventOver = "";
+        beerTally.hiddenRating = false;
+        beerTally.votingStatus = "Voting Over"
+        beerTally.timeTillEventOver = "";
       }
     });
     socket.on('newStuff', function (data) {
-      app.$.beersAjax.generateRequest();
+      beerTally.$.beersAjax.generateRequest();
     });
   </script>
 </html>
