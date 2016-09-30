@@ -15,6 +15,13 @@
     "test",
     "tests"
   ],
+  "overrides": {
+    "webcomponentsjs": {
+      "main": [
+        "webcomponents-lite.min.js"
+      ]
+    }
+  },
   "dependencies": {
     "polymer": "Polymer/polymer#^1.6.1",
     "paper-toolbar": "PolymerElements/paper-toolbar#^1.1.6",
