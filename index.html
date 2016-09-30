@@ -232,7 +232,7 @@
                     && (submitterName !== '');
     }
 
-    var socket = io.connect('http://localhost:3007');
+    var socket = io.connect('/');
     socket.on('message', function (data) {
       console.info(data);
     });
