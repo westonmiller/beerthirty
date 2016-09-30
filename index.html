@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DashBoard</title>
+
+    <script src="/bower_components/webcomponentsjs/webcomponents.js"></script>
+
+    <link rel="import" href="bower_components/polymer/polymer.html">
+    <link rel="import" href="bower_components/paper-card/paper-card.html">
+    <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+    <link rel="import" href="bower_components/app-layout/app-toolbar/app-toolbar.html">
+    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-input/paper-textarea.html">
+    <link rel="import" href="bower_components/iron-icons/iron-icons.html" >
+
+    <link rel="import" href="elements/beer-item.html">
+
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <style is="custom-style">
+      body {
+        margin: 0;
+        font-family: "Helvetica Neue"
+      }
+      app-toolbar {
+        position: fixed;
+        width: 100%;
+        z-index: 500;
+        background-color: #F5A828;
+        color: #1C1304;
+        font-family: BeerFont, fantasy;
+        font-size: 40px;
+      }
+      #beerList {
+        padding-top: 64px;
+        width: 100%;
+      }
+      paper-card {
+        margin-top:  10px;
+        padding: 10px;
+        width: 100%;
+      }
+      paper-icon-button.addBeer {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        color:  #F5A828;
+        width: 60px;
+        height: 60px;
+      }
+      .buttons {
+        margin-bottom: 7px;
+        position: relative;
+        font-size: 16px;
+        color: grey;
+      }
+      .buttons .submit {
+        color:  #F5A828;
+        font-weight: 600;
+      }
+      .votingTimer {
+        font-size: 14px;
+        font-family: "Helvetica Neue";
+        margin-right: 20px;
+      }
+      .timer {
+        padding-left: 10px;
+        font-size: 12px;
+        font-weight: 200;
+      }
+      paper-button[disabled] {
+        color: white !important;
+      }
+      paper-input {
+        --paper-input-container-focus-color: #F5A828;
+      }
+      @font-face {
+        font-family:  'BeerFont';
+        src: url('fonts/OldLondon.ttf') format('truetype');
+      }
+    </style>
+  </head>
+  <body unresolved>
+    <template is="dom-bind" id="app" noscript>
+      <app-toolbar>
+        <div main-title>Brew Tally</div>
+        <span class="votingTimer">{{votingStatus}}<span class="timer">{{timeTillEventOver}}</span></span>
+      </app-toolbar>
+        <div id="beerList">
+          <template is="dom-repeat" items="{{beers}}">
+            <paper-card>
+              <beer-item beer={{item}} hidden-rating={{hiddenRating}}></beer-item>
+            </paper-card>
+          </template>
+        </div>
+      </div>
+
+      <paper-icon-button icon="add-circle"
+                         class="addBeer"
+                         on-tap="addBeer">
+
+      </paper-icon-button>
+      <paper-dialog id="addBeerModal">
+        <h2>Add Beer</h2>
+        <paper-input id="beerName"
+                     value={{beerName}}
+                     label="Name"
+                     auto-validate
+                     required
+                     on-input="checkValidation"
+                     invalid={{beerNameIsNotValid}}
+                     error-message="Can't be blank">
+
+        </paper-input>
+        <paper-input id="brewery"
+                     value={{brewery}}
+                     label="Brewery"
+                     auto-validate
+                     invalid={{breweryIsNotValid}}
+                     required
+                     on-input="checkValidation"
+                     error-message="Can't be blank">
+
+        </paper-input>
+        <paper-textarea id="description" label="Description" value={{description}}></paper-textarea>
+        <paper-input id="submitterName"
+                     value={{submitterName}}
+                     label="Your Name"
+                     auto-validate
+                     required
+                     on-input="checkValidation"
+                     invalid={{submitterNameIsNotValid}}
+                     error-message="Can't be blank">
+
+        </paper-input>
+        <div class="buttons">
+          <paper-button on-tap="closeAddBeerModal">Cancel</paper-button>
+          <paper-button id="addBeerSubmitButton"
+                        class="submit"
+                        disabled="{{!isValid}}"
+                        on-tap="submitBeer">
+
+            Add Beer
+          </paper-button>
+        </div>
+
+
+      </paper-dialog>
+
+      <iron-ajax
+        id="beersAjax"
+        auto
+        url="/beers"
+        handle-as="json"
+        last-response="{{beers}}">
+
+      <iron-ajax
+        id="createBeerAjax"
+        url="/beers"
+        content-type="application/json"
+        handle-as="json"
+        method="POST"
+        on-response="beerAdded">
+
+      </iron-ajax>
+    </template>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    let app = document.querySelector('#app');
+
+    app.isValid = false;
+    app.hiddenRating = true;
+
+    app.addBeer = () => {
+      app.$.addBeerModal.open();
+    };
+
+    app.submitBeer = () => {
+      const { beerName, brewery, submitterName, description } = app;
+      const newBeer = {
+        name: beerName,
+        brewery,
+        description,
+        submitter: submitterName
+      }
+      app.$.createBeerAjax.body = newBeer;
+      app.$.createBeerAjax.generateRequest();
+    }
+
+    app.closeAddBeerModal = () => {
+      const { beerName, brewery, description, submitterName, addBeerSubmitButton } = app.$
+      app.beerName = '';
+      app.brewery = '';
+      app.description = '';
+      app.submitterName = '';
+
+      addBeerSubmitButton.focus();
+
+      beerName.invalid = false;
+      brewery.invalid = false;
+      description.invalid = false;
+      submitterName.invalid = false;
+
+      app.checkValidation();
+
+      app.$.addBeerModal.close();
+    };
+
+    app.beerAdded = () => {
+      app.$.beersAjax.generateRequest();
+      app.closeAddBeerModal();
+    };
+
+    app.checkValidation = () => {
+      const { beerName, brewery, submitterName } = app
+
+      if (app.$.beerName.focused) {
+        app.$.beerName.validate()
+      }
+      if (app.$.brewery.focused) {
+        app.$.brewery.validate()
+      }
+      if (app.$.submitterName.focused) {
+        app.$.submitterName.validate()
+      }
+
+      app.isValid = (beerName !== '')
+                    && (brewery !== '')
+                    && (submitterName !== '');
+    }
+
+    var socket = io.connect('http://localhost:3007');
+    socket.on('message', function (data) {
+      console.info(data);
+    });
+    socket.on('timeTillEventOver', function (data) {
+      if (data.seconds >= 0) {
+        app.hiddenRating = true;
+        app.votingStatus = "Voting Ends"
+        app.timeTillEventOver = data.timeTillEventOver;
+      } else {
+        app.hiddenRating = false;
+        app.votingStatus = "Voting Over"
+        app.timeTillEventOver = "";
+      }
+    });
+    socket.on('newStuff', function (data) {
+      app.$.beersAjax.generateRequest();
+    });
+  </script>
+</html>

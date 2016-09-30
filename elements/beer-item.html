@@ -1,0 +1,186 @@
+<link rel="import" type="text/css" href="../bower_components/polymer/polymer.html">
+<link rel="import" type="text/css" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" type="text/css" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" type="text/css" href="../bower_components/paper-slider/paper-slider.html">
+<link rel="import" type="text/css" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" type="text/css" href="./rating-star.html">
+
+<dom-module id="beer-item">
+  <template>
+    <style>
+      h3, h4 {
+        font-family: "Helvetica Neue";
+        font-weight: 300;
+      }
+      h3 {
+        font-size: 20px;
+        margin: 0;
+      }
+      h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 400;
+      }
+      paper-dialog {
+        margin: 0;
+      }
+      paper-button.rate {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        color: #F5A828;
+      }
+      .buttons {
+        margin-bottom: -26px;
+        position: relative;
+        font-size: 16px;
+      }
+      .caption {
+        padding-left: 12px;
+        color: #a0a0a0;
+      }
+      .label {
+        font-size: 12px;
+      }
+      .stars {
+        display: block;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+      }
+      .ratingStarts {
+        display: block;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+      }
+      .star {
+        width: 25px;
+        height: 25px;
+        display: inline-block;
+      }
+      .buttons {
+        margin-bottom: 7px;
+        position: relative;
+        font-size: 16px;
+        color: grey;
+      }
+      .buttons .submit {
+        color:  #F5A828;
+        font-weight: 600;
+      }
+    </style>
+
+      <div>
+        <h3> {{beer.name}} </h3>
+        <h4> {{beer.brewery}} </h4>
+        <div class="stars">
+          <template is="dom-repeat" items='[1,2,3,4,5,6,7,8,9,10]' >
+            <div class="star" hidden={{hiddenRating}}>
+              <rating-star value={{starValue(beer.rating,item)}}
+                           color='#F5A828'
+                           background-color='white'>
+
+              </rating-star>
+            </div>
+          </template>
+        </div>
+        <paper-button class="rate"
+                      on-tap="openRateModal"
+                      hidden={{!hiddenRating}} raised>
+
+          Rate
+        </paper-button>
+        <paper-dialog id="rateModal" modal>
+          <h2> {{beer.name}} <h2>
+          <paper-input label="Your Name"
+                       id="reviewer"
+                       value="{{reviewer}}"
+                       required
+                       auto-validate
+                       on-input="validateReview"
+                       invalid={{reviewerInvalid}}>
+
+          </paper-input>
+          <div class="label">
+          <div>Overall Rating: <span id="ratingsLabel" class="caption">{{overallRating}}</span></div>
+          <div class="ratingStars">
+            <template is="dom-repeat" items='[1,2,3,4,5,6,7,8,9,10]' >
+              <div class="star" on-click="starTapped" id={{item}}>
+                <rating-star value={{starValue(rating,item)}}
+                             color='#F5A828'
+                             background-color='#f8dfb5'>
+
+                </rating-star>
+              </div>
+            </template>
+          </div>
+
+          </div>
+
+          <div class="buttons">
+            <paper-button dialog-confirm>Cancel</paper-button>
+            <paper-button dialog-confirm
+                          class="submit"
+                          on-tap="submitRating"
+                          disabled={{!canSubmitReview}}>
+
+              Rate
+            </paper-button>
+          </div>
+
+        </paper-dialog>
+      </div>
+      <iron-ajax
+        id="createReviewAjax"
+        content-type="application/json"
+        handle-as="json"
+        method="POST"
+        on-response="beerAdded">
+
+      </iron-ajax>
+  </template>
+  <script>
+    Polymer({
+      is: 'beer-item',
+      properties: {
+        beer: Object,
+        hiddenRating: Boolean,
+        reviewer: String,
+        canSubmitReview: {
+          type: Boolean,
+          value: false
+        },
+        rating: {
+          type: Number,
+          value: 0
+        }
+      },
+      openRateModal: function () {
+        this.$.rateModal.open();
+      },
+      starTapped: function (event) {
+        this.rating = event.currentTarget.id;
+        this.canSubmitReview = !this.reviewerInvalid && this.rating
+      },
+      starValue(rating, starNumber) {
+        return rating - starNumber + 1;
+      },
+      submitRating() {
+        const { reviewer, rating } = this;
+        const newRating = {
+          reviewer,
+          overallRating: rating
+        }
+        this.$.createReviewAjax.url = `/beers/${this.beer.id}/reviews`;
+        this.$.createReviewAjax.body = newRating;
+        this.$.createReviewAjax.generateRequest()
+      },
+      validateReview() {
+        this.$.reviewer.validate();
+        this.canSubmitReview = !this.reviewerInvalid && this.rating
+      }
+
+    });
+  </script>
+</dom-module>

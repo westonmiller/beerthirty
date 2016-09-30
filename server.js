@@ -3,11 +3,46 @@ import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import Beer from './models/Beer';
 import Review from './models/Review';
+import socketio from 'socket.io';
+import http from 'http';
+import path from 'path';
+import moment from 'moment';
+import 'countdown';
+import 'moment-countdown';
+
+let app = express();
+let server = http.Server(app);
+let io = socketio(server);
+
+String.prototype.paddingLeft = function () {
+   return String('00' + this).slice(-2);
+};
+
+server.listen(process.env.PORT || 3007);
+
+let eventEndTime = moment().add(1, 'minutes').valueOf();
+
+io.on('connection', (socket) => {
+  app.socket = socket;
+  socket.emit('message','Connected');
+  setInterval(function() {
+    const currentTime = moment().valueOf();
+    const seconds = eventEndTime - currentTime;
+    const duration = moment.duration(seconds);
+    const timeTillEventOver = duration.hours().toString().paddingLeft() + ':'
+                              + duration.minutes().toString().paddingLeft() + ':'
+                              + duration.seconds().toString().paddingLeft();
+    socket.emit('timeTillEventOver', {timeTillEventOver, seconds});
+    if (seconds  < -60 * 1000) {
+      //this will be removed once we get close enough to the actual event
+      eventEndTime = moment().add(1, 'minutes').valueOf();
+      // clearInterval(eventTimer);
+    }
+  }, 1000);
+});
 
 
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/beerthirty');
-
-const app = express();
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/beertally');
 
 app.use(bodyParser.json());
 
@@ -33,6 +68,7 @@ app.post('/beers', (request, response) => {
         newBeer.save((error, beer) => {
           if (!error) {
             response.status(201).send(beer);
+            app.socket.emit('newStuff', 'newReview');
           } else {
             response.send(error);
           }
@@ -103,6 +139,7 @@ app.post('/beers/:id/reviews', (request, response) => {
         beer.reviews.push(review);
         beer.save((error) => {
           if (error) {response.status(500).send(error);}
+          app.socket.emit('newStuff', 'newReview');
           response.status(201).send(review);
         });
       });
@@ -138,10 +175,11 @@ app.get('/beers/:id/reviews/:reviewId', (request, response) => {
 
 
 app.get('/', (request, response) => {
-  response.send(`Welcome to Beerthrity`);
+  response.sendFile(path.join( __dirname, './index.html'));
 });
 
-app.listen(process.env.PORT || 3007);
+app.use('/', express.static(__dirname));
+
 
 process.on('SIGINT', function() {
   console.info('Closing Server');
@@ -150,3 +188,4 @@ process.on('SIGINT', function() {
     process.exit();
   });
 });
+
