@@ -69,11 +69,19 @@
         color:  #F5A828;
         font-weight: 600;
       }
+      #reviews {
+        position: absolute;
+        right: 107px;
+        top: 23px;
+        font-size: 12px;
+        font-weight: 200;
+      }
     </style>
 
       <div>
-        <h3> {{beer.name}} </h3>
-        <h4> {{beer.brewery}} </h4>
+        <h3> {{toTitleCase(beer.name)}} </h3>
+        <span id="reviews"> {{beer.reviews.length}} reviews</span>
+        <h4> {{toTitleCase(beer.brewery)}} </h4>
         <div class="stars">
           <template is="dom-repeat" items='[1,2,3,4,5,6,7,8,9,10]' >
             <div class="star" hidden={{hiddenRating}}>
@@ -179,6 +187,11 @@
       validateReview() {
         this.$.reviewer.validate();
         this.canSubmitReview = !this.reviewerInvalid && this.rating
+      },
+      toTitleCase(string) {
+        return string.replace(/\w\S*/g, (txt) => {
+          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
       }
 
     });
