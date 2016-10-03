@@ -30,6 +30,9 @@
         top: 10px;
         color: #F5A828;
       }
+      paper-input {
+        --paper-input-container-focus-color: #F5A828;
+      }
       .buttons {
         margin-bottom: -26px;
         position: relative;
@@ -100,7 +103,7 @@
           Rate
         </paper-button>
         <paper-dialog id="rateModal" modal>
-          <h2> {{beer.name}} <h2>
+          <h2> {{toTitleCase(beer.name)}} <h2>
           <paper-input label="Your Name"
                        id="reviewer"
                        value="{{reviewer}}"
@@ -143,8 +146,7 @@
         id="createReviewAjax"
         content-type="application/json"
         handle-as="json"
-        method="POST"
-        on-response="beerAdded">
+        method="POST">
 
       </iron-ajax>
   </template>

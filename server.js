@@ -68,7 +68,7 @@ app.post('/beers', (request, response) => {
         newBeer.save((error, beer) => {
           if (!error) {
             response.status(201).send(beer);
-            app.socket.emit('newStuff', 'newReview');
+            io.emit('newStuff', 'newReview');
           } else {
             response.send(error);
           }
@@ -139,7 +139,7 @@ app.post('/beers/:id/reviews', (request, response) => {
         beer.reviews.push(review);
         beer.save((error) => {
           if (error) {response.status(500).send(error);}
-          app.socket.emit('newStuff', 'newReview');
+          io.emit('newStuff', 'newReview');
           response.status(201).send(review);
         });
       });
