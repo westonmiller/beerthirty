@@ -70,6 +70,7 @@ app.post('/beers', (request, response) => {
           if (!error) {
             response.status(201).send(beer);
             io.emit('newStuff', 'newReview');
+            io.emit('newBeer', beer);
           } else {
             response.send(error);
           }
