@@ -142,6 +142,7 @@ app.post('/beers/:id/reviews', (request, response) => {
         beer.save((error) => {
           if (error) {response.status(500).send(error);}
           io.emit('newStuff', 'newReview');
+          io.emit('newBeer', beer);
           response.status(201).send(review);
         });
       });
