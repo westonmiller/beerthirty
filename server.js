@@ -69,7 +69,8 @@ app.post('/beers', (request, response) => {
         newBeer.save((error, beer) => {
           if (!error) {
             io.emit('newBeer', beer);
-            io.emit('newStuff', 'newReview');
+            console.log('New Beer Updated')
+            // io.emit('newStuff', 'newReview');
             response.status(201).send(beer);
           } else {
             response.send(error);
