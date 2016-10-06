@@ -69,8 +69,7 @@ app.post('/beers', (request, response) => {
         newBeer.save((error, beer) => {
           if (!error) {
             io.emit('newBeer', beer);
-            console.log('New Beer Updated')
-            // io.emit('newStuff', 'newReview');
+            io.emit('newStuff', 'newReview');
             response.status(201).send(beer);
           } else {
             response.send(error);
@@ -143,6 +142,7 @@ app.post('/beers/:id/reviews', (request, response) => {
           if (error) {response.status(500).send(error);}
           io.emit('newStuff', 'newReview');
           io.emit('updatedBeer', beer);
+          console.log('new review', beer)
           response.status(201).send(review);
         });
       });
