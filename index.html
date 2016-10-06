@@ -127,7 +127,7 @@
                      error-message="Can't be blank">
 
         </paper-input>
-        <paper-textarea id="description" label="Description" value={{description}}></paper-textarea>
+        <paper-input id="imageURL" label="Image URL" value={{imageURL}}></paper-input>
         <paper-input id="submitterName"
                      value={{submitterName}}
                      label="Your Name"
@@ -188,11 +188,11 @@
     };
 
     beerTally.submitBeer = () => {
-      const { beerName, brewery, submitterName, description } = beerTally;
+      const { beerName, brewery, submitterName, imageURL } = beerTally;
       const newBeer = {
         name: beerName,
         brewery,
-        description,
+        imageURL,
         submitter: submitterName
       }
       beerTally.$.createBeerAjax.body = newBeer;
@@ -200,17 +200,17 @@
     }
 
     beerTally.closeAddBeerModal = () => {
-      const { beerName, brewery, description, submitterName, addBeerSubmitButton } = beerTally.$
+      const { beerName, brewery, imageURL, submitterName, addBeerSubmitButton } = beerTally.$
       beerTally.beerName = '';
       beerTally.brewery = '';
-      beerTally.description = '';
+      beerTally.imageURL = '';
       beerTally.submitterName = '';
 
       addBeerSubmitButton.focus();
 
       beerName.invalid = false;
       brewery.invalid = false;
-      description.invalid = false;
+      imageURL.invalid = false;
       submitterName.invalid = false;
 
       beerTally.checkValidation();

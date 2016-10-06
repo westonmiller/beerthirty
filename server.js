@@ -20,7 +20,7 @@ String.prototype.paddingLeft = function () {
 
 server.listen(process.env.PORT || 3007);
 
-let eventEndTime = moment().add(2, 'minutes').valueOf();
+let eventEndTime = moment('2016-10-06 12:45').valueOf();
 
 io.on('connection', (socket) => {
   app.socket = socket;
@@ -47,7 +47,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/beertally');
 app.use(bodyParser.json());
 
 app.post('/beers', (request, response) => {
-  const {name, brewery, submitter, description} = request.body;
+  const {name, brewery, submitter, imageURL} = request.body;
 
   Beer.find(
     {
@@ -62,7 +62,7 @@ app.post('/beers', (request, response) => {
           name: name.toLowerCase(),
           brewery: brewery.toLowerCase(),
           submitter: submitter.toLowerCase(),
-          description
+          imageURL
         });
 
         newBeer.save((error, beer) => {
