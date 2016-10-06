@@ -20,7 +20,7 @@ String.prototype.paddingLeft = function () {
 
 server.listen(process.env.PORT || 3007);
 
-let eventEndTime = moment('2016-10-06 12:00-06:00').valueOf();
+let eventEndTime = moment('2016-10-06 17:00-06:00').valueOf();
 
 io.on('connection', (socket) => {
   app.socket = socket;
@@ -137,12 +137,11 @@ app.post('/beers/:id/reviews', (request, response) => {
 
       newReview.save((error, review) => {
         if (error) {response.status(500).send(error);}
-
         beer.reviews.push(review);
-        beer.save((error) => {
+        beer.save((error, beer) => {
           if (error) {response.status(500).send(error);}
           io.emit('newStuff', 'newReview');
-          io.emit('newBeer', beer);
+          io.emit('updatedBeer', beer);
           response.status(201).send(review);
         });
       });
