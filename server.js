@@ -33,6 +33,7 @@ io.on('connection', (socket) => {
                               + duration.minutes().toString().paddingLeft() + ':'
                               + duration.seconds().toString().paddingLeft();
     socket.emit('timeTillEventOver', {timeTillEventOver, seconds});
+    socket.emit('humanReadableTimeTillOver', timeTillEventOver);
 
     if (seconds <= 0) {
       io.emit('eventOver', true);
