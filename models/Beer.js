@@ -7,6 +7,7 @@ const beerSchema = new Schema({
   brewery: String,
   submitter: String,
   description: String,
+  imageURL: String,
   reviews: [{type: mongoose.Schema.Types.ObjectId, ref: 'Review'}]
 }, {
   toJSON: {virtuals: true}

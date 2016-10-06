@@ -29,7 +29,11 @@
         backgroundColor: String
       },
       style (value) {
-        return `background: linear-gradient(to right, ${this.color} ${value * 100}%,${this.backgroundColor} ${value * 100}%,${this.backgroundColor} 100%);`
+        let valuePercent = 100;
+        if (parseFloat(value) < 1.0) {
+          valuePercent = parseFloat(value) * 100;
+        }
+        return `background: linear-gradient(to right, #F5A828 ${valuePercent}%,white ${valuePercent}%,white 100%);`
       }
     });
   </script>

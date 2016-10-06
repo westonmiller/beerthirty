@@ -29,6 +29,7 @@
     "countdown": "^2.6.0",
     "express": "^4.14.0",
     "http": "0.0.0",
+    "jquery": "^3.1.1",
     "moment": "^2.15.1",
     "moment-countdown": "0.0.3",
     "mongoose": "^4.6.1",

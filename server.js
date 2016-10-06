@@ -20,12 +20,12 @@ String.prototype.paddingLeft = function () {
 
 server.listen(process.env.PORT || 3007);
 
-let eventEndTime = moment().add(1, 'minutes').valueOf();
+let eventEndTime = moment('2016-10-06 12:45').valueOf();
 
 io.on('connection', (socket) => {
   app.socket = socket;
   socket.emit('message','Connected');
-  setInterval(function() {
+  let eventTimer = setInterval(function() {
     const currentTime = moment().valueOf();
     const seconds = eventEndTime - currentTime;
     const duration = moment.duration(seconds);
@@ -33,10 +33,10 @@ io.on('connection', (socket) => {
                               + duration.minutes().toString().paddingLeft() + ':'
                               + duration.seconds().toString().paddingLeft();
     socket.emit('timeTillEventOver', {timeTillEventOver, seconds});
-    if (seconds  < -60 * 1000) {
-      //this will be removed once we get close enough to the actual event
-      eventEndTime = moment().add(1, 'minutes').valueOf();
-      // clearInterval(eventTimer);
+
+    if (seconds <= 0) {
+      io.emit('eventOver', true);
+      clearInterval(eventTimer);
     }
   }, 1000);
 });
@@ -47,7 +47,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/beertally');
 app.use(bodyParser.json());
 
 app.post('/beers', (request, response) => {
-  const {name, brewery, submitter, description} = request.body;
+  const {name, brewery, submitter, imageURL} = request.body;
 
   Beer.find(
     {
@@ -62,7 +62,7 @@ app.post('/beers', (request, response) => {
           name: name.toLowerCase(),
           brewery: brewery.toLowerCase(),
           submitter: submitter.toLowerCase(),
-          description
+          imageURL
         });
 
         newBeer.save((error, beer) => {
@@ -176,6 +176,10 @@ app.get('/beers/:id/reviews/:reviewId', (request, response) => {
 
 app.get('/', (request, response) => {
   response.sendFile(path.join( __dirname, './index.html'));
+});
+
+app.get('/tv', (request, response) => {
+  response.sendFile(path.join( __dirname, './tvIndex.html'));
 });
 
 app.use('/', express.static(__dirname));
