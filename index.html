@@ -259,5 +259,8 @@
     socket.on('newStuff', function (data) {
       beerTally.$.beersAjax.generateRequest();
     });
+    socket.on('newBeer', function (data) {
+      beerTally.$.beersAjax.generateRequest();
+    });
   </script>
 </html>

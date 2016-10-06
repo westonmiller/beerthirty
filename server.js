@@ -140,7 +140,7 @@ app.post('/beers/:id/reviews', (request, response) => {
         beer.reviews.push(review);
         beer.save((error, beer) => {
           if (error) {response.status(500).send(error);}
-          io.emit('newStuff', 'newReview');
+          // io.emit('newStuff', 'newReview');
           io.emit('updatedBeer', beer);
           console.log('new review', beer)
           response.status(201).send(review);
