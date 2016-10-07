@@ -50,6 +50,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/beertally');
 app.use(bodyParser.json());
 
 app.post('/beers', (request, response) => {
+  console.log('SOMTHING HAPPENED')
   const {name, brewery, submitter, imageURL} = request.body;
   console.log('_____________________')
   console.log('Beer added', name, brewery, submitter)
