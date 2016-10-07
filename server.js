@@ -20,13 +20,13 @@ String.prototype.paddingLeft = function () {
 
 server.listen(process.env.PORT || 3007);
 
-let eventEndTime = moment('2016-10-07 17:00-12:00');
+let eventEndTime = moment('2016-10-07 12:00-06:00');
 let eventEndTimeSeconds = eventEndTime.valueOf();
 
 io.on('connection', (socket) => {
   app.socket = socket;
   socket.emit('message','Connected');
-  socket.emit('eventEndTime', eventEndTime);
+  socket.emit('eventEndTime', eventEndTime.format('YYYY-DD-MM HH:mm:ssZ'));
   let eventTimer = setInterval(function() {
     const currentTime = moment().valueOf();
     const seconds = eventEndTimeSeconds - currentTime;
