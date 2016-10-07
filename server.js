@@ -85,6 +85,7 @@ app.post('/beers', (request, response) => {
 });
 
 app.get('/beers', (request, response) => {
+  console.log('BEERS GET')
   Beer.find({}).populate('reviews').exec((error, beers) => {
     if (!error) {
       response.status(200).send(beers);
