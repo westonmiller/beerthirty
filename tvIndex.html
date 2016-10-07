@@ -243,7 +243,6 @@
     function displayStands() {
       let beers = app.beers;
       beers.sort((a,b) => b.rating-a.rating)
-      console.log(beers)
       $('#firstPlaceStand').css({'max-height': '530px'});
       $('#secondPlaceStand').css({'max-height': '371px'});
       $('#thirdPlaceStand').css({'max-height': '212px'});
