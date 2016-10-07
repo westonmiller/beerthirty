@@ -51,7 +51,9 @@ app.use(bodyParser.json());
 
 app.post('/beers', (request, response) => {
   const {name, brewery, submitter, imageURL} = request.body;
-
+  console.log('_____________________')
+  console.log('Beer added', name, brewery, submitter)
+  console.log('_____________________')
   Beer.find(
     {
       name: name.toLowerCase(),
