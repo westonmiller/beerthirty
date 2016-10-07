@@ -26,7 +26,7 @@ let eventEndTimeSeconds = eventEndTime.valueOf();
 io.on('connection', (socket) => {
   app.socket = socket;
   socket.emit('message','Connected');
-  socket.emmit('eventEndTime', eventEndTime);
+  socket.emit('eventEndTime', eventEndTime);
   let eventTimer = setInterval(function() {
     const currentTime = moment().valueOf();
     const seconds = eventEndTimeSeconds - currentTime;
