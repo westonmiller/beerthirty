@@ -18,5 +18,9 @@ beerSchema.virtual('rating').get(function () {
   return total / this.reviews.length;
 });
 
+beerSchema.virtual('numberOfReviews').get(function() {
+	return this.reviews.length
+});
+
 
 export default mongoose.model('Beer', beerSchema);
