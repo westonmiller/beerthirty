@@ -20,7 +20,7 @@ String.prototype.paddingLeft = function () {
 
 server.listen(process.env.PORT || 3007);
 
-let eventEndTime = moment('2016-10-07 14:54-06:00');
+let eventEndTime = moment('2016-10-10 14:54-06:00');
 let eventEndTimeSeconds = eventEndTime.valueOf();
 
 io.on('connection', (socket) => {
