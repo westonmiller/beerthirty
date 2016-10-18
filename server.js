@@ -14,16 +14,18 @@ let app = express();
 let server = http.Server(app);
 let io = socketio(server);
 
+
 String.prototype.paddingLeft = function () {
    return String('00' + this).slice(-2);
 };
 
 server.listen(process.env.PORT || 3007);
 
-let eventEndTime = moment('2016-10-18 10:26-06:00');
+let eventEndTime = moment('2016-10-18 11:15-06:00');
 let eventEndTimeSeconds = eventEndTime.valueOf();
 
 io.on('connection', (socket) => {
+  var eventOverNotificationSent = false;
   app.socket = socket;
   socket.emit('message','Connected');
   socket.emit('eventEndTime', eventEndTime.format('YYYY-MM-DD HH:mm:ssZ'));
@@ -41,7 +43,10 @@ io.on('connection', (socket) => {
       clearInterval(eventTimer);
     }
     if (seconds <= 0 ) {
-      io.emit('eventOver', true);
+      if (!eventOverNotificationSent) {
+        io.emit('eventOver', true);
+        eventOverNotificationSent = true;
+      }
     }
   }, 1000);
 });

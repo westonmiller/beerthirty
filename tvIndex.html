@@ -243,13 +243,15 @@
     function displayStands() {
       let beers = app.beers;
       beers.sort((a,b) => b.rating-a.rating)
+
+      console.log('Sorted Beers', beers)
       $('#firstPlaceStand').css({'max-height': '530px'});
       $('#secondPlaceStand').css({'max-height': '371px'});
       $('#thirdPlaceStand').css({'max-height': '212px'});
       setTimeout(function() {
-        displayWinner(app.beers[0].id, 'third', () => {
+        displayWinner(app.beers[2].id, 'third', () => {
           displayWinner(app.beers[1].id, 'second', () => {
-            displayWinner(app.beers[2].id, 'first', () => {
+            displayWinner(app.beers[0].id, 'first', () => {
               confetti.start()
               confetti.resize()
             });
