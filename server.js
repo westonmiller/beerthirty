@@ -20,7 +20,7 @@ String.prototype.paddingLeft = function () {
 
 server.listen(process.env.PORT || 3007);
 
-let eventEndTime = moment('2016-10-18 10:23-06:00');
+let eventEndTime = moment('2016-10-18 10:26-06:00');
 let eventEndTimeSeconds = eventEndTime.valueOf();
 
 io.on('connection', (socket) => {
@@ -38,8 +38,10 @@ io.on('connection', (socket) => {
     socket.emit('humanReadableTimeTillOver', timeTillEventOver);
 
     if (seconds <= -30000) {
-      io.emit('eventOver', true);
       clearInterval(eventTimer);
+    }
+    if (seconds <= 0 ) {
+      io.emit('eventOver', true);
     }
   }, 1000);
 });
