@@ -131,6 +131,7 @@ app.delete('/beers/:id', (request, response) => {
 app.post('/beers/:id/reviews', (request, response) => {
   const { id } = request.params;
   const { overallRating, reviewer } = request.body;
+
   if (!overallRating) {
     response.status(418).send('No overallRating');
     return;
@@ -138,24 +139,38 @@ app.post('/beers/:id/reviews', (request, response) => {
 
   Beer.findById(id).populate('reviews').exec((error, beer) => {
     if (!error && beer) {
-      const newReview = new Review({
-        overallRating: overallRating,
-        reviewer: reviewer,
-        beerId: id
+
+
+
+      Review.find({ beerId: id, reviewer}, (error, reviews) => {
+        if (reviews.length > 0) {
+          return response.sendStatus(418)
+        } else {
+          const newReview = new Review({
+            overallRating: overallRating,
+            reviewer: reviewer,
+            beerId: id
+          });
+
+          newReview.save((error, review) => {
+            if (error) {response.status(500).send(error);}
+            beer.reviews.push(review);
+            beer.save((error) => {
+              if (error) {return response.status(500).send(error);}
+              io.emit('newStuff', 'newReview');
+              io.emit('newBeer', beer);
+              return response.status(201).send(review);
+            });
+          });
+          
+        }
       });
 
-      newReview.save((error, review) => {
-        if (error) {response.status(500).send(error);}
-        beer.reviews.push(review);
-        beer.save((error) => {
-          if (error) {response.status(500).send(error);}
-          io.emit('newStuff', 'newReview');
-          io.emit('newBeer', beer);
-          response.status(201).send(review);
-        });
-      });
+
+
+
     } else {
-      response.status(404).send('No Beer Found');
+      return response.status(404).send('No Beer Found');
     }
   });
 });
